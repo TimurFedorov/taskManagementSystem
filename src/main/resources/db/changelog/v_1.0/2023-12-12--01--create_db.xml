@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="2023-12-12--01--create_db" author="FedorovTimur">
+        <createTable tableName="user_account">
+            <column  name="id"  type="bigserial"  autoIncrement="true">
+                <constraints  primaryKey="true"
+                              nullable="false"/>
+            </column>
+            <column  name="username"  type="varchar(50)">
+                <constraints  unique="true"
+                              nullable="false"/>
+            </column>
+            <column  name="password"  type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column  name="role"  type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="task">
+            <column  name="id"  type="bigserial"  autoIncrement="true">
+                <constraints  primaryKey="true"
+                              nullable="false"/>
+            </column>
+            <column  name="header"  type="varchar(50)">
+                <constraints  unique="true"
+                              nullable="false"/>
+            </column>
+            <column  name="description"  type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column  name="status"  type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column  name="priority"  type="varchar(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column  name="author_id"  type="bigint">
+                <constraints foreignKeyName="task_author_fk"
+                             references="user_account(id)"
+                             nullable="false"/>
+            </column>
+            <column  name="executor_id"  type="bigint">
+                <constraints foreignKeyName="task_executor_fk"
+                             references="user_account(id)"
+                             nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="comment">
+            <column  name="id"  type="bigserial"  autoIncrement="true">
+                <constraints  primaryKey="true"
+                              nullable="false"/>
+            </column>
+            <column  name="text"  type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column  name="author_id"  type="bigint">
+                <constraints foreignKeyName="comment_author_fk"
+                             references="user_account(id)"
+                             nullable="false"/>
+            </column>
+            <column  name="task_id"  type="bigint">
+                <constraints foreignKeyName="comment_task_fk"
+                             references="task(id)"
+                             nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+
+</databaseChangeLog>

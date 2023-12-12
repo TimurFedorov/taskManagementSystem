@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 
 @Data
@@ -25,6 +26,7 @@ public class User {
     @Email
     @Column(name = "username", unique = true)
     @NotNull
+    @Size(min = 5, max = 50)
     private String username;
 
     @JsonIgnore

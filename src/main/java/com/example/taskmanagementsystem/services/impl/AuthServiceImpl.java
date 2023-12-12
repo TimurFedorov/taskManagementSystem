@@ -1,6 +1,6 @@
 package com.example.taskmanagementsystem.services.impl;
 
-import com.example.taskmanagementsystem.dto.AuthDTO;
+import com.example.taskmanagementsystem.dto.UserDTO;
 import com.example.taskmanagementsystem.mappers.UserMapper;
 import com.example.taskmanagementsystem.models.User;
 import com.example.taskmanagementsystem.repositories.UserRepository;
@@ -27,8 +27,8 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public Map<String, String> register(AuthDTO authDTO) {
-        User user = userMapper.authDTOToUser(authDTO);
+    public Map<String, String> register(UserDTO userDTO) {
+        User user = userMapper.userDTOToUser(userDTO);
         if (!userRepository.findByUsername(user.getUsername()).isEmpty()) {
             throw new EntityException("User with username: " + user.getUsername() + " is already registered");
         }
@@ -40,12 +40,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Map<String, String> login(AuthDTO authDTO) {
+    public Map<String, String> login(UserDTO userDTO) {
         UsernamePasswordAuthenticationToken authInputToken =
-                new UsernamePasswordAuthenticationToken(authDTO.getUsername(),
-                        authDTO.getPassword());
+                new UsernamePasswordAuthenticationToken(userDTO.getUsername(),
+                        userDTO.getPassword());
         authenticationManager.authenticate(authInputToken);
-        String token = jwtUtil.generateToken(authDTO.getUsername());
+        String token = jwtUtil.generateToken(userDTO.getUsername());
         return Map.of("jwt-token", token);
     }
 

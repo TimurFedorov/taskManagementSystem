@@ -33,11 +33,11 @@ public class Task {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "task_status")
+    @Column(name = "status")
     @NotNull
     private String status;
 
-    @Column(name = "status")
+    @Column(name = "priority")
     @NotNull
     private String priority;
 

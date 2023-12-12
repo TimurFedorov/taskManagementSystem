@@ -1,12 +1,12 @@
 package com.example.taskmanagementsystem.services;
 
-import com.example.taskmanagementsystem.dto.AuthDTO;
+import com.example.taskmanagementsystem.dto.UserDTO;
 
 import java.util.Map;
 
 
 public interface AuthService {
-    Map<String, String> register(AuthDTO authDTO);
-    Map<String, String> login(AuthDTO authDTO);
+    Map<String, String> register(UserDTO userDTO);
+    Map<String, String> login(UserDTO userDTO);
 
 }
