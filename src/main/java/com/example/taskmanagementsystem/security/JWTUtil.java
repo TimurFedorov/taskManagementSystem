@@ -18,11 +18,12 @@ public class JWTUtil {
     private String secret;
 
     @Value("${jwt.token.expired}")
-    private long validityInMilliseconds;
+    private long lifeTimeInMilliseconds;
 
     public String generateToken(String username) {
+
         Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
+        Date validity = new Date(now.getTime() + lifeTimeInMilliseconds);
 
         return JWT.create()
                 .withSubject("User details")

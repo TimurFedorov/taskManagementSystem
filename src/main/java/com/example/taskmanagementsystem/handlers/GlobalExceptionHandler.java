@@ -1,10 +1,10 @@
 package com.example.taskmanagementsystem.handlers;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.taskmanagementsystem.utils.EntityException;
 import com.example.taskmanagementsystem.utils.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,8 +32,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(JWTVerificationException.class)
-    private ResponseEntity<ErrorResponse> handleException (JWTVerificationException e) {
+    @ExceptionHandler(BadCredentialsException.class)
+    private ResponseEntity<ErrorResponse> handleException (BadCredentialsException e) {
         ErrorResponse response = new ErrorResponse(e.getMessage(), System.currentTimeMillis());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }

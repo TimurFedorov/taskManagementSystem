@@ -1,13 +1,16 @@
 package com.example.taskmanagementsystem.config;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.example.taskmanagementsystem.security.JWTUtil;
+import com.example.taskmanagementsystem.security.JwtUserDetailsService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.example.taskmanagementsystem.security.JWTUtil;
-import com.example.taskmanagementsystem.security.JwtUserDetailsService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -16,46 +19,39 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
     private final JwtUserDetailsService jwtUserDetailsService;
 
-    public JWTFilter(JWTUtil jwtUtil, JwtUserDetailsService jwtUserDetailsService) {
-        this.jwtUtil = jwtUtil;
-        this.jwtUserDetailsService = jwtUserDetailsService;
-    }
-
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = httpServletRequest.getHeader("Authorization");
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String authHeader = request.getHeader("Authorization");
+        String username = null;
+        String jwt = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
+            try {
+                username = jwtUtil.validateTokenAndRetrieveClaim(jwt);
+                UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
 
-        if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")) {
-            String jwt = authHeader.substring(7);
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(userDetails,
+                                userDetails.getPassword(),
+                                userDetails.getAuthorities());
 
-            if (jwt.isBlank()) {
-                httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        "Invalid JWT Token in Bearer Header");
-            } else {
-                try {
-                    String username = jwtUtil.validateTokenAndRetrieveClaim(jwt);
-                    UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
-
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(userDetails,
-                                    userDetails.getPassword(),
-                                    userDetails.getAuthorities());
-
-                    if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-                    }
-                } catch (JWTVerificationException exc) {
-                    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                            "Invalid JWT Token");
+                if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
+            } catch (TokenExpiredException e) {
+                log.debug("Время жизни токена вышло");
+            } catch (JWTDecodeException e) {
+                log.debug("Подпись неправильная");
             }
         }
 
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+        filterChain.doFilter(request, response);
     }
 }

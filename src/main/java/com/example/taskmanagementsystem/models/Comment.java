@@ -1,5 +1,6 @@
 package com.example.taskmanagementsystem.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -36,5 +37,6 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "task_id", referencedColumnName = "id")
     @NotNull
+    @JsonIgnore
     private Task task;
 }
