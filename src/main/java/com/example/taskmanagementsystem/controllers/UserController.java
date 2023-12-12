@@ -21,13 +21,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/myInfo")
-    public String showUserInfo() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtUser jwtUser = (JwtUser) authentication.getPrincipal();
-        return jwtUser.getUsername();
-    }
-
     @GetMapping()
     @Operation(summary = "Get all user information")
     public List<User> getAll() {
